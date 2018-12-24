@@ -5,13 +5,31 @@ import (
 	"testing"
 )
 
+const headerLink = `<http://localhost:8882/user/15193133/repos?page=2>; rel="prev", <http://localhost:8882/user/15193133/repos?page=4>; rel="next", <http://localhost:8882/user/15193133/repos?page=5>; rel="last", <http://localhost:8882/user/15193133/repos?page=1>; rel="first"`
+
+func Test_GetLink_Input_List_Link_Should_Be_Struct_List_Link(t *testing.T) {
+	expectedListLink := ListLink{
+		Previous: "http://localhost:8882/user/15193133/repos?page=2",
+		Next:     "http://localhost:8882/user/15193133/repos?page=4",
+		Last:     "http://localhost:8882/user/15193133/repos?page=5",
+		First:    "http://localhost:8882/user/15193133/repos?page=1",
+	}
+	inputHeaderLink := headerLink
+
+	actualListLink := GetLink(inputHeaderLink)
+
+	if expectedListLink != actualListLink {
+		t.Errorf("expect %v but it got %v", expectedListLink, actualListLink)
+	}
+}
+
 func Test_ConvertTimeToTimestamp_Input_Time_RFC3339_Format_Should_Be_Error(t *testing.T) {
 	inputTimeString := "1970-01-01 00:00:00"
 
 	_, actualError := ConvertTimeToTimestamp(inputTimeString)
 
 	if actualError == nil {
-		t.Errorf("expected %v but it got %v", nil, actualError)
+		t.Errorf("expect %v but it got %v", nil, actualError)
 	}
 }
 
