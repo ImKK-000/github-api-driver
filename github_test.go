@@ -7,6 +7,22 @@ import (
 
 const headerLink = `<http://localhost:8882/user/15193133/repos?page=2>; rel="prev", <http://localhost:8882/user/15193133/repos?page=4>; rel="next", <http://localhost:8882/user/15193133/repos?page=5>; rel="last", <http://localhost:8882/user/15193133/repos?page=1>; rel="first"`
 
+func Test_CallAPI_Input_URL_Should_Be_Response_And_Header_Link(t *testing.T) {
+	expectedResponseBody := []byte("{}")
+	expectedHeader := map[string]string{"Link": headerLink}
+	mockServer := mockServer(expectedHeader, expectedResponseBody)
+	defer mockServer.Close()
+
+	actualResponseBody, actualHeaderLink := CallAPI(mockServer.Client(), mockServer.URL)
+
+	if string(expectedResponseBody) != string(actualResponseBody) {
+		t.Errorf("expect\n'%s'\nbut it got\n'%s'", string(expectedResponseBody), string(actualResponseBody))
+	}
+	if expectedHeader["Link"] != actualHeaderLink {
+		t.Errorf("expect\n'%s'\nbut it got\n'%s'", expectedHeader["Link"], actualHeaderLink)
+	}
+}
+
 func Test_GetLink_Input_List_Link_Should_Be_Struct_List_Link(t *testing.T) {
 	expectedListLink := ListLink{
 		Previous: "http://localhost:8882/user/15193133/repos?page=2",

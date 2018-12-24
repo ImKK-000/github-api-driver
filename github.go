@@ -1,6 +1,9 @@
 package github
 
 import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"regexp"
 	"strings"
 	"time"
@@ -30,4 +33,14 @@ func GetLink(headerLink string) ListLink {
 		Last:     linkMapping["last"],
 		First:    linkMapping["first"],
 	}
+}
+
+func CallAPI(client *http.Client, url string) ([]byte, string) {
+	response, err := client.Get(url)
+	fmt.Println(response, err)
+	if err != nil {
+		return []byte{}, ""
+	}
+	responseBody, _ := ioutil.ReadAll(response.Body)
+	return responseBody, response.Header.Get("Link")
 }
