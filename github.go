@@ -1,6 +1,7 @@
 package github
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -15,6 +16,7 @@ type ListLink struct {
 type Github struct {
 	ResponseBody []byte
 	HeaderLink   ListLink
+	Error        error
 }
 
 func ConvertTimeToTimestamp(timeString string) (int64, error) {
@@ -42,18 +44,25 @@ func GetLink(headerLink string) ListLink {
 func CallAPI(client *http.Client, url string) Github {
 	response, err := client.Get(url)
 	if err != nil {
-		return Github{}
+		return Github{
+			Error: err,
+		}
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return Github{}
+		return Github{
+			Error: err,
+		}
 	}
 	headerLink := response.Header.Get("Link")
 	if len(headerLink) == 0 {
-		return Github{}
+		return Github{
+			Error: errors.New("Header link not found"),
+		}
 	}
 	return Github{
 		ResponseBody: responseBody,
 		HeaderLink:   GetLink(headerLink),
+		Error:        nil,
 	}
 }

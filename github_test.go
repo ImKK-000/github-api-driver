@@ -8,6 +8,31 @@ import (
 
 const headerLink = `<http://localhost:8882/user/15193133/repos?page=2>; rel="prev", <http://localhost:8882/user/15193133/repos?page=4>; rel="next", <http://localhost:8882/user/15193133/repos?page=5>; rel="last", <http://localhost:8882/user/15193133/repos?page=1>; rel="first"`
 
+func Test_CallAPI_Input_URL_http_Should_Be_Get_Header_Response_Error_Message(t *testing.T) {
+	expectedErrorMessage := "Header link not found"
+	mockServer := mockServer(nil, nil)
+	defer mockServer.Close()
+
+	responseGithub := CallAPI(mockServer.Client(), mockServer.URL)
+
+	if expectedErrorMessage != responseGithub.Error.Error() {
+		t.Errorf("expect '%s' but it got '%s'", expectedErrorMessage, responseGithub.Error.Error())
+	}
+}
+
+func Test_CallAPI_Input_URL_http_Should_Be_Get_Response_Error_Message(t *testing.T) {
+	expectedErrorMessage := "Get http:: http: no Host in request URL"
+	headerMapping := map[string]string{"Link": headerLink}
+	mockServer := mockServer(headerMapping, nil)
+	defer mockServer.Close()
+
+	responseGithub := CallAPI(mockServer.Client(), "http://")
+
+	if expectedErrorMessage != responseGithub.Error.Error() {
+		t.Errorf("expect '%s' but it got '%s'", expectedErrorMessage, responseGithub.Error.Error())
+	}
+}
+
 func Test_CallAPI_Input_URL_Should_Be_HeaderLink(t *testing.T) {
 	expectedHeaderLinkPrevious := "http://localhost:8882/user/15193133/repos?page=2"
 	expectedHeaderLinkNext := "http://localhost:8882/user/15193133/repos?page=4"
