@@ -1,6 +1,7 @@
 package github
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -21,7 +22,8 @@ type Github struct {
 }
 
 type OAuthKeyStore struct {
-	ClientID, ClientSecret string
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
 }
 
 func ConvertTimeToTimestamp(timeString string) (int64, error) {
@@ -72,6 +74,14 @@ func CallAPI(client *http.Client, url string) Github {
 	}
 }
 
-func (oAuthKeyStore OAuthKeyStore) String() string {
+func (oAuthKeyStore *OAuthKeyStore) ReadKey(filename string) error {
+	keyDataBytes, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(keyDataBytes, oAuthKeyStore)
+}
+
+func (oAuthKeyStore OAuthKeyStore) ToQueryString() string {
 	return fmt.Sprintf("&client_id=%s&client_secret=%s", oAuthKeyStore.ClientID, oAuthKeyStore.ClientSecret)
 }

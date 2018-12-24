@@ -8,17 +8,39 @@ import (
 
 const headerLink = `<http://localhost:8882/user/15193133/repos?page=2>; rel="prev", <http://localhost:8882/user/15193133/repos?page=4>; rel="next", <http://localhost:8882/user/15193133/repos?page=5>; rel="last", <http://localhost:8882/user/15193133/repos?page=1>; rel="first"`
 
-func Test_OAuthKeyStore_String_Input_ClientID_1234_ClientSecret_aabbcc_Should_Be_QueryString(t *testing.T) {
+func Test_OAuthKeyStore_ReadKey_Input_Filename_key_error_dot_json_Should_Be_Unmarshal_Key_Error(t *testing.T) {
+	expectedErrorMessage := "invalid character '}' looking for beginning of object key string"
+	oAuthKeyStore := OAuthKeyStore{}
+
+	actualErrorMessage := oAuthKeyStore.ReadKey("key_error.json")
+
+	if expectedErrorMessage != actualErrorMessage.Error() {
+		t.Errorf("expect '%s' but it got '%s'", expectedErrorMessage, actualErrorMessage.Error())
+	}
+}
+
+func Test_OAuthKeyStore_ReadKey_Input_Filename_input_error_dot_txt_Should_Be_ReadFile_Error(t *testing.T) {
+	expectedErrorMessage := "open input_error.txt: no such file or directory"
+	oAuthKeyStore := OAuthKeyStore{}
+
+	actualErrorMessage := oAuthKeyStore.ReadKey("input_error.txt")
+
+	if expectedErrorMessage != actualErrorMessage.Error() {
+		t.Errorf("expect '%s' but it got '%s'", expectedErrorMessage, actualErrorMessage.Error())
+	}
+}
+
+func Test_OAuthKeyStore_ToQueryString_Input_ClientID_1234_ClientSecret_aabbcc_Should_Be_QueryString(t *testing.T) {
 	expectedQueryString := "&client_id=1234&client_secret=aabbcc"
 	oAuthKeyStore := OAuthKeyStore{
 		ClientID:     "1234",
 		ClientSecret: "aabbcc",
 	}
 
-	acutualQueryString := oAuthKeyStore.String()
+	actualQueryString := oAuthKeyStore.ToQueryString()
 
-	if expectedQueryString != acutualQueryString {
-		t.Errorf("expect '%s' but it got '%s'", expectedQueryString, acutualQueryString)
+	if expectedQueryString != actualQueryString {
+		t.Errorf("expect '%s' but it got '%s'", expectedQueryString, actualQueryString)
 	}
 }
 
