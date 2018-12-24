@@ -2,6 +2,7 @@ package github
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -17,6 +18,10 @@ type Github struct {
 	ResponseBody []byte
 	HeaderLink   ListLink
 	Error        error
+}
+
+type OAuthKeyStore struct {
+	ClientID, ClientSecret string
 }
 
 func ConvertTimeToTimestamp(timeString string) (int64, error) {
@@ -65,4 +70,8 @@ func CallAPI(client *http.Client, url string) Github {
 		HeaderLink:   GetLink(headerLink),
 		Error:        nil,
 	}
+}
+
+func (oAuthKeyStore OAuthKeyStore) String() string {
+	return fmt.Sprintf("&client_id=%s&client_secret=%s", oAuthKeyStore.ClientID, oAuthKeyStore.ClientSecret)
 }

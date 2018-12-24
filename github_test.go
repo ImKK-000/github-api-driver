@@ -8,6 +8,20 @@ import (
 
 const headerLink = `<http://localhost:8882/user/15193133/repos?page=2>; rel="prev", <http://localhost:8882/user/15193133/repos?page=4>; rel="next", <http://localhost:8882/user/15193133/repos?page=5>; rel="last", <http://localhost:8882/user/15193133/repos?page=1>; rel="first"`
 
+func Test_OAuthKeyStore_String_Input_ClientID_1234_ClientSecret_aabbcc_Should_Be_QueryString(t *testing.T) {
+	expectedQueryString := "&client_id=1234&client_secret=aabbcc"
+	oAuthKeyStore := OAuthKeyStore{
+		ClientID:     "1234",
+		ClientSecret: "aabbcc",
+	}
+
+	acutualQueryString := oAuthKeyStore.String()
+
+	if expectedQueryString != acutualQueryString {
+		t.Errorf("expect '%s' but it got '%s'", expectedQueryString, acutualQueryString)
+	}
+}
+
 func Test_CallAPI_Input_URL_http_Should_Be_Get_Header_Response_Error_Message(t *testing.T) {
 	expectedErrorMessage := "Header link not found"
 	mockServer := mockServer(nil, nil)
