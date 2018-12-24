@@ -7,6 +7,7 @@ import (
 
 func mockServer(responseHeader map[string]string, responseBody []byte) *httptest.Server {
 	handler := func(rw http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
 		for key, value := range responseHeader {
 			rw.Header().Set(key, value)
 		}
