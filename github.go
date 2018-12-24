@@ -1,7 +1,6 @@
 package github
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -11,6 +10,11 @@ import (
 
 type ListLink struct {
 	Previous, Next, Last, First string
+}
+
+type Github struct {
+	ResponseBody []byte
+	HeaderLink   ListLink
 }
 
 func ConvertTimeToTimestamp(timeString string) (int64, error) {
@@ -35,12 +39,21 @@ func GetLink(headerLink string) ListLink {
 	}
 }
 
-func CallAPI(client *http.Client, url string) ([]byte, string) {
+func CallAPI(client *http.Client, url string) Github {
 	response, err := client.Get(url)
-	fmt.Println(response, err)
 	if err != nil {
-		return []byte{}, ""
+		return Github{}
 	}
-	responseBody, _ := ioutil.ReadAll(response.Body)
-	return responseBody, response.Header.Get("Link")
+	responseBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return Github{}
+	}
+	headerLink := response.Header.Get("Link")
+	if len(headerLink) == 0 {
+		return Github{}
+	}
+	return Github{
+		ResponseBody: responseBody,
+		HeaderLink:   GetLink(headerLink),
+	}
 }
